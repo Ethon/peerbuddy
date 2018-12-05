@@ -10,7 +10,12 @@ public final class AccountAttributeParsing {
 		if (valueStartIndex == -1) {
 			throw new InvalidArgumentException("Input string '" + s + "' contains no value");
 		}
-		final AccountValue value = ValueParsing.parseValue(trimmed.substring(valueStartIndex).trim());
+		final AccountValue value;
+		try {
+			value = ValueParsing.parseValue(trimmed.substring(valueStartIndex).trim());
+		} catch (final NumberFormatException e) {
+			throw new AttributeException("Error parsing account attribute '" + s + "'", e);
+		}
 		if (valueStartIndex == 0) {
 			return new AccountAttributePair(null, value);
 		}

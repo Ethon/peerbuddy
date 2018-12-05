@@ -1,4 +1,4 @@
-package pw.erler.peerbuddy;
+package pw.erler.peerbuddy.execution;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,8 +9,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.openqa.selenium.WebDriver;
-
 import lombok.extern.log4j.Log4j2;
 import pw.erler.peerbuddy.account.AccountSupport;
 import pw.erler.peerbuddy.account.AccountSupportFactory;
@@ -19,7 +17,9 @@ import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.config.PeerBuddyConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.credentials.CredentialsProvider;
+import pw.erler.peerbuddy.common.selenium_util.AutoCloseableWebDriver;
 import pw.erler.peerbuddy.common.selenium_util.DriverFactory;
+import pw.erler.peerbuddy.common.selenium_util.ErrorUtil;
 
 @Log4j2
 public class AccountRunner {
@@ -29,18 +29,22 @@ public class AccountRunner {
 	private final Map<String, List<AccountConfig>> accountsGroupedByType;
 
 	private void runAccount(final ExecutorService executorService, final AccountConfig account,
-			final Map<AccountConfig, P2PAccountStatus> accountStatusMap) {
+			final Map<AccountConfig, AccountRunResult> accountStatusMap) {
 		executorService.execute(() -> {
-			final Credentials credentials = credentialsProvider.getCredentials(account.getTitle());
-			final WebDriver driver = DriverFactory.createDriver(config.getSeleniumConfig());
-			try {
-				final AccountSupport accountSupport = AccountSupportFactory.createAccountSupport(driver, account);
-				accountSupport.login(credentials);
-				accountStatusMap.put(account, accountSupport.retrieveAccountStatus(P2PAccountStatus.class));
-			} catch (final Exception e) {
-				log.error("Error", e);
-			} finally {
-				driver.close();
+			try (AutoCloseableWebDriver driver = DriverFactory.createDriver(config.getSeleniumConfig())) {
+				try {
+					log.info(String.format("Running account '%s'", account.getTitle()));
+					final Credentials credentials = credentialsProvider.getCredentials(account.getTitle());
+					final AccountSupport accountSupport = AccountSupportFactory.createAccountSupport(driver, account);
+					accountSupport.login(credentials);
+					accountStatusMap.put(account,
+							new AccountRunResult(accountSupport.retrieveAccountStatus(P2PAccountStatus.class)));
+					log.info(String.format("Finished running account '%s'", account.getTitle()));
+				} catch (final Exception e) {
+					log.error(String.format("Error while running account '%s'", account.getTitle()), e);
+					ErrorUtil.dumpPageSource(driver, account.getTitle());
+					accountStatusMap.put(account, new AccountRunResult(e));
+				}
 			}
 		});
 	}
@@ -53,9 +57,9 @@ public class AccountRunner {
 				.collect(Collectors.groupingBy(AccountConfig::getType));
 	}
 
-	public Map<AccountConfig, P2PAccountStatus> runAll() throws InterruptedException {
-		final Map<AccountConfig, P2PAccountStatus> accountStatusMap = new HashMap<>();
-		final Map<AccountConfig, P2PAccountStatus> synchronizedMap = Collections.synchronizedMap(accountStatusMap);
+	public Map<AccountConfig, AccountRunResult> runAll() throws InterruptedException {
+		final Map<AccountConfig, AccountRunResult> accountStatusMap = new HashMap<>();
+		final Map<AccountConfig, AccountRunResult> synchronizedMap = Collections.synchronizedMap(accountStatusMap);
 		final ExecutorService executorService = Executors.newFixedThreadPool(accountsGroupedByType.size());
 		try {
 			accountsGroupedByType.values().stream().flatMap(List::stream).filter(AccountConfig::isEnabled)

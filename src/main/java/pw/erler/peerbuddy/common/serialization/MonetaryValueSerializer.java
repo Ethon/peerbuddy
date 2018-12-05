@@ -1,6 +1,7 @@
 package pw.erler.peerbuddy.common.serialization;
 
 import java.lang.reflect.Type;
+import java.util.Locale;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -14,7 +15,7 @@ public class MonetaryValueSerializer implements JsonSerializer<MonetaryValue> {
 	@Override
 	public JsonElement serialize(final MonetaryValue src, final Type typeOfSrc,
 			final JsonSerializationContext context) {
-		return new JsonPrimitive(src.toString());
+		return new JsonPrimitive(src.toString(Locale.ENGLISH));
 	}
 
 }

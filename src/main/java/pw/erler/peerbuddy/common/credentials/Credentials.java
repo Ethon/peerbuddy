@@ -22,10 +22,10 @@ public final class Credentials {
 		this.properties = properties;
 	}
 
-	public String getStringProperty(final String key) throws MissingCredentialsPropertyException {
+	public String getStringProperty(final String key) throws CredentialsException {
 		final String property = properties.get(key);
 		if (property == null) {
-			throw new MissingCredentialsPropertyException("Property '" + key + "' is missing");
+			throw new CredentialsException("Property '" + key + "' is missing");
 		}
 		return property;
 	}
@@ -34,7 +34,7 @@ public final class Credentials {
 		return properties.getOrDefault(key, defaultValue);
 	}
 
-	public Integer getIntProperty(final String key) throws MissingCredentialsPropertyException {
+	public Integer getIntProperty(final String key) throws CredentialsException {
 		return Integer.valueOf(getStringProperty(key));
 	}
 

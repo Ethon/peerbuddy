@@ -17,9 +17,12 @@ public class AccountStatusModel {
 	private MonetaryValue accountBalance;
 	private MonetaryValue investedFunds;
 	private MonetaryValue availableFunds;
+	private String error;
 
 	public List<String> getCells() {
-		return Arrays.asList(title, accountBalance.toString(), investedFunds.toString(), availableFunds.toString());
+		return Arrays.asList(title, accountBalance != null ? accountBalance.toString() : "",
+				investedFunds != null ? investedFunds.toString() : "",
+				availableFunds != null ? availableFunds.toString() : "", error != null ? error : "");
 	}
 
 }

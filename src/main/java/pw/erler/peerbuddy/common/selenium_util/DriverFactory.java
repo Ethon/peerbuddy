@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -18,20 +17,21 @@ import pw.erler.peerbuddy.common.config.SeleniumDriverConfig;
 
 public final class DriverFactory {
 
-	private static WebDriver createDriver(final String driverName, final Path driverPath, final boolean headless) {
+	private static AutoCloseableWebDriver createDriver(final String driverName, final Path driverPath,
+			final boolean headless) {
 		switch (driverName.toLowerCase()) {
 		case "chrome":
 			System.setProperty("webdriver.chrome.driver", driverPath.toAbsolutePath().toString());
-			return new ChromeDriver(new ChromeOptions().setHeadless(headless));
+			return new AutoCloseableWebDriver(new ChromeDriver(new ChromeOptions().setHeadless(headless)));
 		case "gecko":
 			System.setProperty("webdriver.gecko.driver", driverPath.toAbsolutePath().toString());
-			return new FirefoxDriver();
+			return new AutoCloseableWebDriver(new FirefoxDriver());
 		default:
 			throw new UnsupportedOperationException("Can not create unsupported driver with name '" + driverName + "'");
 		}
 	}
 
-	public static WebDriver createDriver(@NonNull final SeleniumConfig config) {
+	public static AutoCloseableWebDriver createDriver(@NonNull final SeleniumConfig config) {
 		checkNotNull(config, "seleniumConfig missing in config");
 		checkNotNull(config.getSelectedDriver(), "seleniumConfig.selectedDriver missing in config");
 		int i = 0;

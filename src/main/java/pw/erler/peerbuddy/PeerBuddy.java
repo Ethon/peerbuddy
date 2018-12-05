@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 
 import lombok.extern.log4j.Log4j2;
-import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
 import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.config.ConfigLoader;
 import pw.erler.peerbuddy.common.config.ExportConfig;
@@ -19,6 +18,8 @@ import pw.erler.peerbuddy.common.credentials.CredentialsProvider;
 import pw.erler.peerbuddy.common.credentials.CredentialsProviderFactory;
 import pw.erler.peerbuddy.common.misc.LoggingPrintStream;
 import pw.erler.peerbuddy.common.serialization.GsonFactory;
+import pw.erler.peerbuddy.execution.AccountRunResult;
+import pw.erler.peerbuddy.execution.AccountRunner;
 import pw.erler.peerbuddy.export.AccountStatusOverviewModel;
 import pw.erler.peerbuddy.export.ExportModelGenerator;
 import pw.erler.peerbuddy.export.exporter.ExporterFactory;
@@ -44,7 +45,7 @@ public final class PeerBuddy {
 				.createCredentialsProvider(config.getPasswordConfig());
 
 		// Retrieve the status of all accounts.
-		final Map<AccountConfig, P2PAccountStatus> accountStatus = new AccountRunner(credentialsProvider, config,
+		final Map<AccountConfig, AccountRunResult> accountStatus = new AccountRunner(credentialsProvider, config,
 				config.getAccounts()).runAll();
 
 		// Create the export model and log it.

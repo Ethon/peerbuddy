@@ -1,21 +1,39 @@
 package pw.erler.peerbuddy.account.p2p.lendy;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 import pw.erler.peerbuddy.account.p2p.AbstractSeleniumP2PAccountSupport;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
 import pw.erler.peerbuddy.common.credentials.Credentials;
-import pw.erler.peerbuddy.common.values.AccountAttributePair;
-import pw.erler.peerbuddy.common.values.AccountAttributeParsing;
+import pw.erler.peerbuddy.common.selenium_util.WebElementDescription;
 import pw.erler.peerbuddy.common.values.AccountValue;
 import pw.erler.peerbuddy.common.values.MonetaryValue;
 
 public class LendySeleniumAccountSupport extends AbstractSeleniumP2PAccountSupport {
+
+	private static final String LOANS_PAGE = "https://lendy.co.uk/loans/available";
+	private static final String LOGIN_PAGE = "https://lendy.co.uk/login";
+
+	private static final WebElementDescription EMAIL_INPUT_FIELD = WebElementDescription //
+			.inputField() //
+			.description("Email") //
+			.finder(finder -> finder.withName("email").isDisplayed(true)) //
+			.build();
+
+	private static final WebElementDescription PASSWORD_INPUT_FIELD = WebElementDescription //
+			.inputField() //
+			.description("Password") //
+			.finder(finder -> finder.withName("password").isDisplayed(true)) //
+			.isPasswordField(true) //
+			.build();
+
+	private static final WebElementDescription LOGIN_BUTTON = WebElementDescription //
+			.button() //
+			.description("Login") //
+			.finder(finder -> finder.withXPath("//form[@id='login']//button").isDisplayed(true)) //
+			.build();
 
 	public LendySeleniumAccountSupport(final WebDriver webDriver) {
 		super(webDriver);
@@ -23,21 +41,17 @@ public class LendySeleniumAccountSupport extends AbstractSeleniumP2PAccountSuppo
 
 	@Override
 	public void login(final Credentials credentials) {
-		get("https://lendy.co.uk/login");
-		sendKeys(finder -> finder.withName("email").isDisplayed(true), 0, credentials.getLogin());
-		sendKeys(finder -> finder.withName("password").isDisplayed(true), 0, credentials.getPassword());
-		click(finder -> finder.withXPath("//form[@id='login']//button").isDisplayed(true), 0);
+		get(LOGIN_PAGE);
+		enterTextIntoInputField(EMAIL_INPUT_FIELD, credentials.getLogin());
+		enterTextIntoInputField(PASSWORD_INPUT_FIELD, credentials.getPassword());
+		clickButton(LOGIN_BUTTON);
 	}
 
 	@Override
 	protected P2PAccountStatus retrieveP2PAccountStatus() {
-		get("https://lendy.co.uk/loans/available");
-		final List<WebElement> all = getAll(find().withXPath("//div[@class='c-account-overview__inner']//article"));
-		final Map<String, AccountValue> attributes = all //
-				.stream() //
-				.map(WebElement::getText) //
-				.map(AccountAttributeParsing::parseAccountAttributePair) //
-				.collect(Collectors.toMap(AccountAttributePair::getKey, AccountAttributePair::getValue));
+		get(LOANS_PAGE);
+		final Map<String, AccountValue> attributes = getAttributes(
+				find().withXPath("//div[@class='c-account-overview__inner']//article"));
 		return new P2PAccountStatus((MonetaryValue) attributes.get("BALANCE"),
 				(MonetaryValue) attributes.get("LIVE LOAN PARTS"), (MonetaryValue) attributes.get("AVAILABLE FUNDS"));
 	}

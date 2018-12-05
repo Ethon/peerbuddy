@@ -8,7 +8,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import pw.erler.peerbuddy.common.credentials.Credentials;
-import pw.erler.peerbuddy.common.credentials.MissingCredentialsPropertyException;
+import pw.erler.peerbuddy.common.credentials.CredentialsException;
 
 @Log4j2
 public class FtpExporter implements Exporter {
@@ -23,7 +23,7 @@ public class FtpExporter implements Exporter {
 				super.connect(host, port);
 			} catch (final IOException e) {
 				throw new ExportException("Failed to connect to FTP host due to I/O error", e);
-			} catch (final MissingCredentialsPropertyException e) {
+			} catch (final CredentialsException e) {
 				throw new ExportException("Could not connect to FTP because credential properties are missing", e);
 			}
 		}

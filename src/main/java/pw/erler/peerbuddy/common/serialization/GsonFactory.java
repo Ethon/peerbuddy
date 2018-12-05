@@ -10,7 +10,7 @@ public final class GsonFactory {
 
 	public static Gson createGson() {
 		final GsonBuilder builder = new GsonBuilder();
-		builder.registerTypeAdapter(MonetaryValue.class, new ToStringSerializer<>());
+		builder.registerTypeAdapter(MonetaryValue.class, new MonetaryValueSerializer());
 		builder.registerTypeAdapter(PercentageValue.class, new ToStringSerializer<>());
 		return builder.create();
 	}

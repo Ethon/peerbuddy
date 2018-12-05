@@ -5,14 +5,18 @@ import java.util.Currency;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public final class ValueParsing {
 
 	private static final int GROUP_NEGATE = 1;
 	private static final int GROUP_TYPE_SYMBOL_PRE = 2;
-	private static final int GROUP_THOUSANDS_VALUE = 3;
-	private static final int GROUP_LOW_VALUE = 4;
-	private static final int GROUP_FRACTIONAL_VALUE = 5;
-	private static final int GROUP_TYPE_SYMBOL_POST = 6;
+	private static final int GROUP_NEGATE2 = 3;
+	private static final int GROUP_THOUSANDS_VALUE = 4;
+	private static final int GROUP_LOW_VALUE = 5;
+	private static final int GROUP_FRACTIONAL_VALUE = 6;
+	private static final int GROUP_TYPE_SYMBOL_POST = 7;
 
 	private static final String RE_NEGATE = "(-)?\\s*";
 	private static final String RE_TYPE_SYMBOL = "\\s*([%€£])?\\s*";
@@ -21,7 +25,8 @@ public final class ValueParsing {
 	private static final String RE_THOUSANDS_VALUE = "(\\d{1,3}[,\\s])?";
 	private static final String RE_FULL_VALUE = RE_THOUSANDS_VALUE + RE_LOW_VALUE + RE_VALUE_FRACTIONAL;
 
-	private static final Pattern PATTERN = Pattern.compile(RE_NEGATE + RE_TYPE_SYMBOL + RE_FULL_VALUE + RE_TYPE_SYMBOL);
+	private static final Pattern PATTERN = Pattern
+			.compile(RE_NEGATE + RE_TYPE_SYMBOL + RE_NEGATE + RE_FULL_VALUE + RE_TYPE_SYMBOL);
 
 	private static final BigDecimal ONE_THOUSAND = BigDecimal.valueOf(1_000L);
 
@@ -59,7 +64,7 @@ public final class ValueParsing {
 		}
 
 		// Extract parts.
-		final boolean isNegative = "-".equals(matcher.group(GROUP_NEGATE));
+		final boolean isNegative = "-".equals(matcher.group(GROUP_NEGATE)) || "-".equals(matcher.group(GROUP_NEGATE2));
 		final String typeSymbol = matcher.group(GROUP_TYPE_SYMBOL_PRE) != null ? matcher.group(GROUP_TYPE_SYMBOL_PRE)
 				: matcher.group(GROUP_TYPE_SYMBOL_POST);
 		if (typeSymbol == null) {

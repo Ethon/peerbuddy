@@ -22,8 +22,11 @@ public class Keepass2CredentialsProvider implements CredentialsProvider {
 	}
 
 	@Override
-	public Credentials getCredentials(final String title) {
+	public Credentials getCredentials(final String title) throws CredentialsException {
 		final Entry entry = database.getEntryByTitle(title);
+		if (entry == null) {
+			throw new CredentialsException("No entry found in Keepass2 DB for title '" + title + "'");
+		}
 		final Map<String, String> properties = entry.getProperties().stream()
 				.collect(Collectors.toMap(Property::getKey, Property::getValue));
 		return new Credentials(entry.getUsername(), entry.getPassword(), properties);

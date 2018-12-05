@@ -5,11 +5,13 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 @Value
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class PercentageValue implements AccountValue {
+public class PercentageValue extends AccountValue {
 
 	BigDecimal value;
 

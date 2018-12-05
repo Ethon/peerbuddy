@@ -33,6 +33,9 @@ public class ValueParsingTest {
 		testMonetaryValue("- €1,050.47", "-1050.47", EUR);
 		testMonetaryValue("- €133.47", "-133.47", EUR);
 		testMonetaryValue("- €199", "-199", EUR);
+		testMonetaryValue("€-1,044.06", "-1044.06", EUR);
+		testMonetaryValue("€-44.06", "-44.06", EUR);
+		testMonetaryValue("€-44", "-44", EUR);
 
 		testMonetaryValue("1,225.61 €", "1225.61", EUR);
 		testMonetaryValue("459.61 €", "459.61", EUR);
