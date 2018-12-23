@@ -1,4 +1,4 @@
-package pw.erler.peerbuddy.common.selenium_util;
+package pw.erler.peerbuddy.common.selenium_util.error;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;

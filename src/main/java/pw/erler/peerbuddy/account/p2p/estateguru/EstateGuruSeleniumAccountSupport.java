@@ -40,9 +40,12 @@ public class EstateGuruSeleniumAccountSupport extends AbstractSeleniumP2PAccount
 				.filter(s -> !s.isEmpty()) //
 				.map(AccountAttributeParsing::parseAccountAttributePair) //
 				.collect(Collectors.toMap(AccountAttributePair::getKey, AccountAttributePair::getValue));
-		return new P2PAccountStatus((MonetaryValue) attributes.get("Total Account Value"),
-				((MonetaryValue) attributes.get("Invested")).negate(),
-				(MonetaryValue) attributes.get("Available Amount"));
+
+		final MonetaryValue totalAccountValue = (MonetaryValue) attributes.get("Total Account Value");
+		final MonetaryValue invested = ((MonetaryValue) attributes.get("Invested")).negate();
+		final MonetaryValue reserved = ((MonetaryValue) attributes.get("Reserved")).negate();
+		final MonetaryValue availableAmount = (MonetaryValue) attributes.get("Available Amount");
+		return new P2PAccountStatus(totalAccountValue, invested.add(reserved), availableAmount);
 	}
 
 }

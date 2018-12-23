@@ -59,6 +59,7 @@ public class BondoraSeleniumAccountSupport extends AbstractSeleniumP2PAccountSup
 		enterTextIntoInputField(EMAIL_INPUT_FIELD, credentials.getLogin());
 		enterTextIntoInputField(PASSWORD_INPUT_FIELD, credentials.getPassword());
 		clickButton(LOGIN_BUTTON);
+		awaitPageLoad("Dashboard", DASHBOARD_PAGE);
 	}
 
 	@Override

@@ -19,7 +19,7 @@ import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.credentials.CredentialsProvider;
 import pw.erler.peerbuddy.common.selenium_util.AutoCloseableWebDriver;
 import pw.erler.peerbuddy.common.selenium_util.DriverFactory;
-import pw.erler.peerbuddy.common.selenium_util.ErrorUtil;
+import pw.erler.peerbuddy.common.selenium_util.error.ErrorUtil;
 
 @Log4j2
 public class AccountRunner {
@@ -28,25 +28,41 @@ public class AccountRunner {
 	private final PeerBuddyConfig config;
 	private final Map<String, List<AccountConfig>> accountsGroupedByType;
 
-	private void runAccount(final ExecutorService executorService, final AccountConfig account,
-			final Map<AccountConfig, AccountRunResult> accountStatusMap) {
-		executorService.execute(() -> {
-			try (AutoCloseableWebDriver driver = DriverFactory.createDriver(config.getSeleniumConfig())) {
-				try {
-					log.info(String.format("Running account '%s'", account.getTitle()));
-					final Credentials credentials = credentialsProvider.getCredentials(account.getTitle());
-					final AccountSupport accountSupport = AccountSupportFactory.createAccountSupport(driver, account);
-					accountSupport.login(credentials);
-					accountStatusMap.put(account,
-							new AccountRunResult(accountSupport.retrieveAccountStatus(P2PAccountStatus.class)));
-					log.info(String.format("Finished running account '%s'", account.getTitle()));
-				} catch (final Exception e) {
-					log.error(String.format("Error while running account '%s'", account.getTitle()), e);
-					ErrorUtil.dumpPageSource(driver, account.getTitle());
-					accountStatusMap.put(account, new AccountRunResult(e));
-				}
+	private void runAccountImpl(final AccountConfig account,
+			final Map<AccountConfig, AccountRunResult> accountStatusMap, final int retriesLeft) {
+		boolean error = false;
+		try (AutoCloseableWebDriver driver = DriverFactory.createDriver(config.getSeleniumConfig())) {
+			try {
+				log.info(String.format("Running account '%s'", account.getTitle()));
+				final Credentials credentials = credentialsProvider.getCredentials(account.getTitle());
+				final AccountSupport accountSupport = AccountSupportFactory.createAccountSupport(driver, account);
+				accountSupport.login(credentials);
+				accountStatusMap.put(account,
+						new AccountRunResult(accountSupport.retrieveAccountStatus(P2PAccountStatus.class)));
+				log.info(String.format("Finished running account '%s'", account.getTitle()));
+			} catch (final Exception e) {
+				log.error(String.format("Error while running account '%s'", account.getTitle()), e);
+				ErrorUtil.dumpPageSource(driver, account.getTitle());
+				accountStatusMap.put(account, new AccountRunResult(e));
+				error = true;
 			}
-		});
+		}
+
+		if (error) {
+			if (retriesLeft > 0) {
+				log.info(String.format("Retry running account '%s' - new retry count is %s", account.getTitle(),
+						retriesLeft - 1));
+				runAccountImpl(account, accountStatusMap, retriesLeft - 1);
+			} else {
+				log.debug(String.format("Dont retry running account '%s' - no retries left", account.getTitle()));
+			}
+		}
+
+	}
+
+	private void runAccount(final ExecutorService executorService, final AccountConfig account,
+			final Map<AccountConfig, AccountRunResult> accountStatusMap, final int retriesLeft) {
+		executorService.execute(() -> runAccountImpl(account, accountStatusMap, retriesLeft));
 	}
 
 	public AccountRunner(final CredentialsProvider credentialsProvider, final PeerBuddyConfig config,
@@ -60,10 +76,12 @@ public class AccountRunner {
 	public Map<AccountConfig, AccountRunResult> runAll() throws InterruptedException {
 		final Map<AccountConfig, AccountRunResult> accountStatusMap = new HashMap<>();
 		final Map<AccountConfig, AccountRunResult> synchronizedMap = Collections.synchronizedMap(accountStatusMap);
-		final ExecutorService executorService = Executors.newFixedThreadPool(accountsGroupedByType.size());
+		final ExecutorService executorService = Executors
+				.newFixedThreadPool(config.getMaximumNumberOfParallelThreads());
 		try {
 			accountsGroupedByType.values().stream().flatMap(List::stream).filter(AccountConfig::isEnabled)
-					.forEach(account -> runAccount(executorService, account, synchronizedMap));
+					.forEach(account -> runAccount(executorService, account, synchronizedMap,
+							config.getMaximumNumberOfRetriesPerAccount()));
 		} finally {
 			executorService.shutdown();
 			executorService.awaitTermination(10, TimeUnit.MINUTES);

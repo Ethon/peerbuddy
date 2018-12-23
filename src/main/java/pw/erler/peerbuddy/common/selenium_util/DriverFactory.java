@@ -10,19 +10,30 @@ import java.nio.file.Paths;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.CapabilityType;
 
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import pw.erler.peerbuddy.common.config.SeleniumConfig;
 import pw.erler.peerbuddy.common.config.SeleniumDriverConfig;
 
+@UtilityClass
 public final class DriverFactory {
+
+	private static ChromeDriver createChromeDriver(final Path driverPath, final boolean headless) {
+		System.setProperty("webdriver.chrome.driver", driverPath.toAbsolutePath().toString());
+		final ChromeOptions chromeOptions = new ChromeOptions();
+		chromeOptions.setHeadless(headless);
+		chromeOptions.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+		chromeOptions.setCapability(CapabilityType.ACCEPT_INSECURE_CERTS, true);
+		return new ChromeDriver(chromeOptions);
+	}
 
 	private static AutoCloseableWebDriver createDriver(final String driverName, final Path driverPath,
 			final boolean headless) {
 		switch (driverName.toLowerCase()) {
 		case "chrome":
-			System.setProperty("webdriver.chrome.driver", driverPath.toAbsolutePath().toString());
-			return new AutoCloseableWebDriver(new ChromeDriver(new ChromeOptions().setHeadless(headless)));
+			return new AutoCloseableWebDriver(createChromeDriver(driverPath, headless));
 		case "gecko":
 			System.setProperty("webdriver.gecko.driver", driverPath.toAbsolutePath().toString());
 			return new AutoCloseableWebDriver(new FirefoxDriver());

@@ -1,6 +1,6 @@
-package pw.erler.peerbuddy.common.selenium_util;
+package pw.erler.peerbuddy.common.selenium_util.error;
 
-public class WebElementNotFoundException extends RuntimeException {
+public class WebElementNotFoundException extends SeleniumException {
 
 	private static final long serialVersionUID = -406654597965111017L;
 

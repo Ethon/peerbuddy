@@ -1,7 +1,7 @@
 package pw.erler.peerbuddy.account.p2p.mintos;
 
-import java.math.BigDecimal;
-import java.util.Currency;
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,14 +11,16 @@ import org.openqa.selenium.WebElement;
 
 import pw.erler.peerbuddy.account.p2p.AbstractSeleniumP2PAccountSupport;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
+import pw.erler.peerbuddy.account.transactions.Transaction;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.values.MonetaryValue;
+import pw.erler.peerbuddy.common.values.ValueParsing;
 
 public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccountSupport {
 
-	private MonetaryValue parseMonetaryAmount(final String text) {
-		return new MonetaryValue(new BigDecimal(text.replaceAll("€|\\s", "")), Currency.getInstance("EUR"));
-	}
+//	private MonetaryValue parseMonetaryAmount(final String text) {
+//		return new MonetaryValue(new BigDecimal(text.replaceAll("€|\\s", "")), Currency.getInstance("EUR"));
+//	}
 
 	private Map<String, MonetaryValue> parseTable(final List<WebElement> elements) {
 		final Map<String, MonetaryValue> result = new TreeMap<>();
@@ -27,7 +29,9 @@ public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccou
 		}
 		for (int i = 0; i < elements.size(); i += 2) {
 			final String k = elements.get(i).getText().trim();
-			final MonetaryValue v = parseMonetaryAmount(elements.get(i + 1).getText().trim());
+			final MonetaryValue v = ValueParsing.parseValue(elements.get(i + 1).getText()).monetaryValue(); // parseMonetaryAmount(elements.get(i
+																											// +
+																											// 1).getText().trim());
 			result.put(k, v);
 		}
 		return result;
@@ -39,20 +43,28 @@ public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccou
 
 	@Override
 	public void login(final Credentials credentials) {
-		get("https://www.mintos.com/en/");
-		click(finder -> finder.withTagName("button").withText("Log In").isDisplayed(true), 0);
-		sendKeys(finder -> finder.withName("_username").isDisplayed(true), 0, credentials.getLogin());
-		sendKeys(finder -> finder.withName("_password").isDisplayed(true), 0, credentials.getPassword());
-		click(finder -> finder.withTagName("button").withText("Log In").isDisplayed(true), 1);
+		get(MintosConstants.LOGIN_PAGE_URL);
+		clickButton(MintosConstants.OPEN_LOGIN_PANEL_BUTTON);
+		enterTextIntoInputField(MintosConstants.USERNAME_INPUT_FIELD, credentials.getLogin());
+		enterTextIntoInputField(MintosConstants.PASSWORD_INPUT_FIELD, credentials.getPassword());
+		clickButton(MintosConstants.LOGIN_BUTTON);
 	}
 
 	@Override
 	protected P2PAccountStatus retrieveP2PAccountStatus() {
-		get("https://www.mintos.com/en/overview/");
+		get(MintosConstants.OVERVIEW_PAGE_URL);
 		final Map<String, MonetaryValue> overview = parseTable(
 				getAll(find().withXPath("//li[@class='overview-box'][1]//tr/td")));
 		return new P2PAccountStatus(overview.get("Total"), overview.get("Invested Funds"),
 				overview.get("Available Funds"));
+	}
+
+	@Override
+	public List<Transaction> retrieveTransactions(final LocalDate fromInclusive, final LocalDate toInclusive) {
+		get(MintosConstants.OVERVIEW_PAGE_URL);
+		clearInputField(MintosConstants.ACCOUNT_STATEMENT_PERIOD_FROM_INPUT_FIELD);
+		enterTextIntoInputField(MintosConstants.ACCOUNT_STATEMENT_PERIOD_FROM_INPUT_FIELD, "");
+		return Collections.emptyList();
 	}
 
 }
