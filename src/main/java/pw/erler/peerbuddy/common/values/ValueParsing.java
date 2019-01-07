@@ -19,7 +19,7 @@ public final class ValueParsing {
 	private static final int GROUP_TYPE_SYMBOL_POST = 7;
 
 	private static final String RE_NEGATE = "(-)?\\s*";
-	private static final String RE_TYPE_SYMBOL = "\\s*([%€£])?\\s*";
+	private static final String RE_TYPE_SYMBOL = "\\s*([%€£]|EUR)?\\s*";
 	private static final String RE_VALUE_FRACTIONAL = "([.]\\d{1,2})?";
 	private static final String RE_LOW_VALUE = "(\\d{1,3})";
 	private static final String RE_THOUSANDS_VALUE = "(\\d{1,3}[,\\s])?";
@@ -29,6 +29,24 @@ public final class ValueParsing {
 			.compile(RE_NEGATE + RE_TYPE_SYMBOL + RE_NEGATE + RE_FULL_VALUE + RE_TYPE_SYMBOL);
 
 	private static final BigDecimal ONE_THOUSAND = BigDecimal.valueOf(1_000L);
+
+	private static char detectDecimalSeparator(final String value) {
+		final int lastDot = value.lastIndexOf('.');
+		final int lastComma = value.lastIndexOf(',');
+		if (lastComma > lastDot) {
+			return ',';
+		}
+		return '.';
+	}
+
+	private static String mapToEnglishNumberFormat(final String value) {
+		final String dummyReplacement = "<§§§>";
+		final char separator = detectDecimalSeparator(value);
+		if (separator == ',') {
+			return value.replace(",", dummyReplacement).replace(".", ",").replace(dummyReplacement, ".");
+		}
+		return value;
+	}
 
 	private static BigDecimal buildNumber(final boolean isNegative, final String fractionalValue, final String lowValue,
 			final String thousandsValue) {
@@ -48,6 +66,7 @@ public final class ValueParsing {
 		case "%":
 			return new PercentageValue(value);
 		case "€":
+		case "EUR":
 			return new MonetaryValue(value, Currency.getInstance("EUR"));
 		case "£":
 			return new MonetaryValue(value, Currency.getInstance("GBP"));
@@ -58,7 +77,7 @@ public final class ValueParsing {
 
 	public static AccountValue parseValue(final String s) {
 		// Match pattern.
-		final Matcher matcher = PATTERN.matcher(s.trim());
+		final Matcher matcher = PATTERN.matcher(mapToEnglishNumberFormat(s.trim()));
 		if (!matcher.matches()) {
 			throw new NumberFormatException("Can't parse account value '" + s + "'");
 		}
@@ -81,7 +100,7 @@ public final class ValueParsing {
 	}
 
 	public static int getStartIndexOfValue(final String s) {
-		final Matcher matcher = PATTERN.matcher(s.trim());
+		final Matcher matcher = PATTERN.matcher(mapToEnglishNumberFormat(s.trim()));
 		if (matcher.find()) {
 			return matcher.start();
 		}

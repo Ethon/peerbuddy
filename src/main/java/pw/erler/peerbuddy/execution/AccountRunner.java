@@ -10,8 +10,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import lombok.extern.log4j.Log4j2;
+import pw.erler.peerbuddy.account.AccountStatusVisitor;
 import pw.erler.peerbuddy.account.AccountSupport;
 import pw.erler.peerbuddy.account.AccountSupportFactory;
+import pw.erler.peerbuddy.account.BasicAccountStatus;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
 import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.config.PeerBuddyConfig;
@@ -23,6 +25,28 @@ import pw.erler.peerbuddy.common.selenium_util.error.ErrorUtil;
 
 @Log4j2
 public class AccountRunner {
+
+	private static class StatusVisitor implements AccountStatusVisitor<AccountRunResult> {
+
+		private final AccountConfig account;
+		private final Map<AccountConfig, AccountRunResult> accountStatusMap;
+
+		public StatusVisitor(final AccountConfig account, final Map<AccountConfig, AccountRunResult> accountStatusMap) {
+			this.account = account;
+			this.accountStatusMap = accountStatusMap;
+		}
+
+		@Override
+		public AccountRunResult visit(final BasicAccountStatus status) {
+			return accountStatusMap.put(account, new AccountRunResult(status));
+		}
+
+		@Override
+		public AccountRunResult visit(final P2PAccountStatus status) {
+			return accountStatusMap.put(account, new AccountRunResult(status));
+		}
+
+	}
 
 	private final CredentialsProvider credentialsProvider;
 	private final PeerBuddyConfig config;
@@ -37,8 +61,7 @@ public class AccountRunner {
 				final Credentials credentials = credentialsProvider.getCredentials(account.getTitle());
 				final AccountSupport accountSupport = AccountSupportFactory.createAccountSupport(driver, account);
 				accountSupport.login(credentials);
-				accountStatusMap.put(account,
-						new AccountRunResult(accountSupport.retrieveAccountStatus(P2PAccountStatus.class)));
+				accountSupport.retrieveAccountStatus(new StatusVisitor(account, accountStatusMap));
 				log.info(String.format("Finished running account '%s'", account.getTitle()));
 			} catch (final Exception e) {
 				log.error(String.format("Error while running account '%s'", account.getTitle()), e);

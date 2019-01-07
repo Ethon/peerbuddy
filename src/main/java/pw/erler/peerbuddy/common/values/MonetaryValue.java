@@ -23,6 +23,10 @@ public class MonetaryValue extends AccountValue {
 		this(BigDecimal.valueOf(amount), currency);
 	}
 
+	public MonetaryValue(final Currency currency) {
+		this(BigDecimal.ZERO, currency);
+	}
+
 	public MonetaryValue add(final MonetaryValue other) {
 		checkArgument(other.getCurrency().equals(getCurrency()));
 		return new MonetaryValue(getAmount().add(other.getAmount()), getCurrency());

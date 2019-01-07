@@ -10,7 +10,7 @@ public interface AccountSupport {
 
 	public void login(Credentials credentials);
 
-	public <T extends BasicAccountStatus> T retrieveAccountStatus(Class<T> accountStatusClass);
+	public <T> T retrieveAccountStatus(AccountStatusVisitor<T> visitor);
 
 	public List<Transaction> retrieveTransactions(LocalDate fromInclusive, LocalDate toInclusive);
 

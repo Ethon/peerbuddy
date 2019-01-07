@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import pw.erler.peerbuddy.account.AccountStatusVisitor;
 import pw.erler.peerbuddy.account.BasicAccountStatus;
 import pw.erler.peerbuddy.common.values.MonetaryValue;
 
@@ -22,6 +23,11 @@ public class P2PAccountStatus extends BasicAccountStatus {
 		super(accountBalance);
 		this.investedFunds = investedFunds;
 		this.availableFunds = availableFunds;
+	}
+
+	@Override
+	public <T> T accept(final AccountStatusVisitor<T> visitor) {
+		return visitor.visit(this);
 	}
 
 }

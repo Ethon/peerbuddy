@@ -27,4 +27,8 @@ public class WebElementDescription {
 		return new WebElementDescriptionBuilder().type(WebElementType.BUTTON);
 	}
 
+	public static WebElementDescriptionBuilder label() {
+		return new WebElementDescriptionBuilder().type(WebElementType.LABEL);
+	}
+
 }

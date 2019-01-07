@@ -182,4 +182,14 @@ public abstract class AbstractSeleniumAccountSupport implements AccountSupport {
 		}
 	}
 
+	protected String getLabelText(final WebElementDescription label) {
+		checkArgument(label.getType() == WebElementType.LABEL);
+		log.trace(String.format("Getting value of '%s' text field", label.getDescription()));
+		try {
+			return awaitAndGet(label).getText();
+		} catch (final ConditionTimeoutException e) {
+			throw new WebElementNotFoundException(String.format("Could not locate '%s' label", label.getDescription()));
+		}
+	}
+
 }

@@ -17,4 +17,8 @@ public class BasicAccountStatus {
 
 	private MonetaryValue accountBalance;
 
+	public <T> T accept(final AccountStatusVisitor<T> visitor) {
+		return visitor.visit(this);
+	}
+
 }

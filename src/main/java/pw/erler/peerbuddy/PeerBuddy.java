@@ -6,9 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-
 import lombok.extern.log4j.Log4j2;
 import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.config.ConfigLoader;
@@ -16,7 +13,7 @@ import pw.erler.peerbuddy.common.config.ExportConfig;
 import pw.erler.peerbuddy.common.config.PeerBuddyConfig;
 import pw.erler.peerbuddy.common.credentials.CredentialsProvider;
 import pw.erler.peerbuddy.common.credentials.CredentialsProviderFactory;
-import pw.erler.peerbuddy.common.misc.LoggingPrintStream;
+import pw.erler.peerbuddy.common.misc.LoggingUtil;
 import pw.erler.peerbuddy.common.serialization.GsonFactory;
 import pw.erler.peerbuddy.execution.AccountRunResult;
 import pw.erler.peerbuddy.execution.AccountRunner;
@@ -27,17 +24,9 @@ import pw.erler.peerbuddy.export.exporter.ExporterFactory;
 @Log4j2
 public final class PeerBuddy {
 
-	private static void initializeLogging() {
-		// Selenium writes to err stream - no other code should do that.
-		// In most of the cases the written information is at most debug relevant so
-		// don't log it as error.
-		System.setOut(new LoggingPrintStream(LogManager.getLogger("System.out"), Level.DEBUG));
-		System.setErr(new LoggingPrintStream(LogManager.getLogger("System.err"), Level.DEBUG));
-	}
-
 	public static void main(final String[] args) throws IOException, InterruptedException {
 
-		initializeLogging();
+		LoggingUtil.redirectConsoleOutputStreamsToLog();
 
 		// Load the config and retrieve credentials.
 		final PeerBuddyConfig config = ConfigLoader.loadConfig(Paths.get("peerbuddy.json"));

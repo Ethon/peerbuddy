@@ -10,7 +10,7 @@ import com.google.common.collect.Lists;
 
 import pw.erler.peerbuddy.account.AbstractSeleniumAccountSupport;
 import pw.erler.peerbuddy.account.AccountFeature;
-import pw.erler.peerbuddy.account.BasicAccountStatus;
+import pw.erler.peerbuddy.account.AccountStatusVisitor;
 
 public abstract class AbstractSeleniumP2PAccountSupport extends AbstractSeleniumAccountSupport {
 
@@ -22,13 +22,9 @@ public abstract class AbstractSeleniumP2PAccountSupport extends AbstractSelenium
 						Arrays.asList(accountFeatures))));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends BasicAccountStatus> T retrieveAccountStatus(final Class<T> accountStatusClass) {
-		if (accountStatusClass == BasicAccountStatus.class || accountStatusClass == P2PAccountStatus.class) {
-			return (T) retrieveP2PAccountStatus();
-		}
-		throw new UnsupportedOperationException("Unsupported account status type " + accountStatusClass.getName());
+	public <T> T retrieveAccountStatus(final AccountStatusVisitor<T> visitor) {
+		return retrieveP2PAccountStatus().accept(visitor);
 	}
 
 }

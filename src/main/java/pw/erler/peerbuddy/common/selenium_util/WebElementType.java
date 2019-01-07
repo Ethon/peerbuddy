@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum WebElementType {
 
-	INPUT_FIELD("input field"), BUTTON("button");
+	INPUT_FIELD("input field"), BUTTON("button"), LABEL("label");
 
 	private final String description;
 
