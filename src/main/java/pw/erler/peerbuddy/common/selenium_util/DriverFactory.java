@@ -42,7 +42,8 @@ public final class DriverFactory {
 		}
 	}
 
-	public static AutoCloseableWebDriver createDriver(@NonNull final SeleniumConfig config) {
+	public static AutoCloseableWebDriver createDriver(@NonNull final SeleniumConfig config,
+			final boolean requiresRealBrowser) {
 		checkNotNull(config, "seleniumConfig missing in config");
 		checkNotNull(config.getSelectedDriver(), "seleniumConfig.selectedDriver missing in config");
 		int i = 0;
@@ -58,7 +59,8 @@ public final class DriverFactory {
 				checkArgument(Files.isExecutable(driverPath),
 						"Driver executable '%s' stored in seleniumConfig.availableDrivers[%d].driverPath is not executable",
 						driverPath, i);
-				return createDriver(driverConfig.getName(), driverPath, driverConfig.isHeadless());
+				return createDriver(driverConfig.getName(), driverPath,
+						requiresRealBrowser ? false : driverConfig.isHeadless());
 			}
 			++i;
 		}

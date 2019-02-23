@@ -17,8 +17,10 @@ public class ValueParsingTest {
 	private static final Currency GBP = Currency.getInstance("GBP");
 
 	private void testMonetaryValue(final String toTest, final String normalizedValue, final Currency currency) {
-		assertThat(ValueParsing.parseValue(toTest))
-				.isEqualTo(new MonetaryValue(new BigDecimal(normalizedValue), currency));
+		final MonetaryValue expected = new MonetaryValue(new BigDecimal(normalizedValue), currency);
+		final MonetaryValue actual = ValueParsing.parseValue(toTest).monetaryValue();
+		assertThat(actual.getAmount()).isEqualByComparingTo(expected.getAmount());
+		assertThat(actual.getCurrency()).isEqualTo(expected.getCurrency());
 	}
 
 	private void testPercentValue(final String toTest, final String normalizedValue) {
@@ -36,6 +38,7 @@ public class ValueParsingTest {
 		testMonetaryValue("€-1,044.06", "-1044.06", EUR);
 		testMonetaryValue("€-44.06", "-44.06", EUR);
 		testMonetaryValue("€-44", "-44", EUR);
+		testMonetaryValue("€1,050", "1050.0", EUR);
 
 		testMonetaryValue("1,225.61 €", "1225.61", EUR);
 		testMonetaryValue("459.61 €", "459.61", EUR);
@@ -43,6 +46,7 @@ public class ValueParsingTest {
 		testMonetaryValue("- 1,225.61 €", "-1225.61", EUR);
 		testMonetaryValue("- 459.61 €", "-459.61", EUR);
 		testMonetaryValue("- 555 €", "-555", EUR);
+		testMonetaryValue("1,050 €", "1050.0", EUR);
 
 		testMonetaryValue("1,225.61 EUR", "1225.61", EUR);
 		testMonetaryValue("459.61 EUR", "459.61", EUR);
@@ -50,6 +54,7 @@ public class ValueParsingTest {
 		testMonetaryValue("- 1,225.61 EUR", "-1225.61", EUR);
 		testMonetaryValue("- 459.61 EUR", "-459.61", EUR);
 		testMonetaryValue("- 555 EUR", "-555", EUR);
+		testMonetaryValue("1,050 EUR", "1050.0", EUR);
 	}
 
 	@Test

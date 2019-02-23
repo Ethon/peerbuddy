@@ -21,7 +21,8 @@ public class PaypalSeleniumAccountSupport extends AbstractBasicSeleniumAccountSu
 		clickButton(PaypalConstants.NEXT_BUTTON);
 		enterTextIntoInputField(PaypalConstants.PASSWORD_INPUT_FIELD, credentials.getPassword());
 		clickButton(PaypalConstants.LOGIN_BUTTON);
-		awaitPageLoad("Account summary page", PaypalConstants.SUMMARY_PAGE_URL);
+		awaitPageLoad("Account summary page or Clickthru page or Home page", PaypalConstants.SUMMARY_PAGE_URL,
+				PaypalConstants.CLICKTHRU_PAGE_URL, PaypalConstants.HOME_PAGE_URL);
 	}
 
 	@Override

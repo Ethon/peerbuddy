@@ -55,7 +55,8 @@ public class AccountRunner {
 	private void runAccountImpl(final AccountConfig account,
 			final Map<AccountConfig, AccountRunResult> accountStatusMap, final int retriesLeft) {
 		boolean error = false;
-		try (AutoCloseableWebDriver driver = DriverFactory.createDriver(config.getSeleniumConfig())) {
+		try (AutoCloseableWebDriver driver = DriverFactory.createDriver(config.getSeleniumConfig(),
+				AccountSupportFactory.requiresRealBrowser(account))) {
 			try {
 				log.info(String.format("Running account '%s'", account.getTitle()));
 				final Credentials credentials = credentialsProvider.getCredentials(account.getTitle());

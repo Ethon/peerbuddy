@@ -8,6 +8,8 @@ class PaypalConstants {
 
 	static final String LOGIN_PAGE_URL = "https://www.paypal.com/en/signin";
 	static final String SUMMARY_PAGE_URL = "https://www.paypal.com/myaccount/summary/";
+	static final String CLICKTHRU_PAGE_URL = "https://www.paypal.com/at/webapps/mpp/clickthru/";
+	static final String HOME_PAGE_URL = "https://www.paypal.com/myaccount/home";
 
 	static final WebElementDescription USERNAME_INPUT_FIELD = WebElementDescription //
 			.inputField() //

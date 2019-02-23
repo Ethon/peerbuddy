@@ -34,6 +34,14 @@ public final class ValueParsing {
 		final int lastDot = value.lastIndexOf('.');
 		final int lastComma = value.lastIndexOf(',');
 		if (lastComma > lastDot) {
+			// Before assuming that a comma is the decimal separator, check if it might be a
+			// thousands separator without a decimal separator following.
+			if (lastComma + 3 < value.length()) {
+				final String following = value.substring(lastComma + 1, lastComma + 4);
+				if (following.matches("\\d{3}")) {
+					return '.';
+				}
+			}
 			return ',';
 		}
 		return '.';

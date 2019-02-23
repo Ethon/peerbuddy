@@ -18,10 +18,6 @@ import pw.erler.peerbuddy.common.values.ValueParsing;
 
 public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccountSupport {
 
-//	private MonetaryValue parseMonetaryAmount(final String text) {
-//		return new MonetaryValue(new BigDecimal(text.replaceAll("€|\\s", "")), Currency.getInstance("EUR"));
-//	}
-
 	private Map<String, MonetaryValue> parseTable(final List<WebElement> elements) {
 		final Map<String, MonetaryValue> result = new TreeMap<>();
 		if (elements.size() % 2 != 0) {
@@ -44,7 +40,6 @@ public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccou
 	@Override
 	public void login(final Credentials credentials) {
 		get(MintosConstants.LOGIN_PAGE_URL);
-		clickButton(MintosConstants.OPEN_LOGIN_PANEL_BUTTON);
 		enterTextIntoInputField(MintosConstants.USERNAME_INPUT_FIELD, credentials.getLogin());
 		enterTextIntoInputField(MintosConstants.PASSWORD_INPUT_FIELD, credentials.getPassword());
 		clickButton(MintosConstants.LOGIN_BUTTON);

@@ -3,6 +3,7 @@ package pw.erler.peerbuddy.account;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,10 +47,11 @@ public abstract class AbstractSeleniumAccountSupport implements AccountSupport {
 		return new ElementFinder(webDriver.findElement(By.tagName("html")));
 	}
 
-	protected void awaitPageToBecomeActive(final String url) {
-		log.trace(String.format("Wait for page to become active: %s", url));
-		Awaitility.await(String.format("Wait for page to become active: %s", url)).atMost(1, TimeUnit.MINUTES)
-				.until(() -> url.equals(webDriver.getCurrentUrl()));
+	protected void awaitOnePageToBecomeActive(final String... urls) {
+		log.trace(String.format("Wait for one of the pages to become active: %s", Arrays.toString(urls)));
+		Awaitility.await(String.format("Wait for one of the pages to become active: %s", Arrays.toString(urls)))
+				.atMost(1, TimeUnit.MINUTES)
+				.until(() -> Arrays.stream(urls).anyMatch(url -> webDriver.getCurrentUrl().startsWith(url)));
 		log.trace("Page became active");
 	}
 
@@ -85,6 +87,7 @@ public abstract class AbstractSeleniumAccountSupport implements AccountSupport {
 		return all //
 				.stream() //
 				.map(WebElement::getText) //
+				.filter(s -> !s.isEmpty()) //
 				.map(AccountAttributeParsing::parseAccountAttributePair) //
 				.collect(Collectors.toMap(AccountAttributePair::getKey, AccountAttributePair::getValue));
 	}
@@ -135,11 +138,17 @@ public abstract class AbstractSeleniumAccountSupport implements AccountSupport {
 
 	// High-Level methods with error handling.
 
-	protected void awaitPageLoad(final String description, @NonNull final String url) {
+	protected void getPageAndAwaitLoad(final String description, final String url) {
+		get(url);
+		awaitPageLoad(description, url);
+	}
+
+	protected void awaitPageLoad(final String description, @NonNull final String... urls) {
 		try {
-			awaitPageToBecomeActive(url);
+			awaitOnePageToBecomeActive(urls);
 		} catch (final ConditionTimeoutException e) {
-			throw new PageLoadException(String.format("%s was not loaded", description));
+			throw new PageLoadException(String.format("%s was not loaded (expected '%s' but still is '%s')",
+					description, Arrays.toString(urls), webDriver.getCurrentUrl()));
 		}
 	}
 

@@ -20,6 +20,7 @@ import pw.erler.peerbuddy.common.values.MonetaryValue;
 @Log4j2
 public class BondoraSeleniumAccountSupport extends AbstractSeleniumP2PAccountSupport {
 
+	private static final String GOGROW_PAGE = "https://www.bondora.com/en/gogrow";
 	private static final String DASHBOARD_PAGE = "https://www.bondora.com/en/dashboard";
 	private static final String LOGIN_PAGE = "https://www.bondora.com/en/login";
 
@@ -59,7 +60,7 @@ public class BondoraSeleniumAccountSupport extends AbstractSeleniumP2PAccountSup
 		enterTextIntoInputField(EMAIL_INPUT_FIELD, credentials.getLogin());
 		enterTextIntoInputField(PASSWORD_INPUT_FIELD, credentials.getPassword());
 		clickButton(LOGIN_BUTTON);
-		awaitPageLoad("Dashboard", DASHBOARD_PAGE);
+		awaitPageLoad("Dashboard or Go&Grow", DASHBOARD_PAGE, GOGROW_PAGE);
 	}
 
 	@Override

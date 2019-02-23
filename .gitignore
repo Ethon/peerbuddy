@@ -13,3 +13,4 @@ buildNumber.properties
 *.prefs
 .project
 .classpath
+/dump/

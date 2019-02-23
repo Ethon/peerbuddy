@@ -22,10 +22,14 @@ public final class AccountSupportFactory {
 
 	private static final String PAYPAL = "paypal.com";
 
-	public static AccountSupport createAccountSupport(final WebDriver driver, final AccountConfig config) {
-		checkNotNull(driver);
+	private static void checkConfig(final AccountConfig config) {
 		checkNotNull(config, "accountConfig is missing in config");
 		checkNotNull(config.getType(), "accountConfig.type is missing in config");
+	}
+
+	public static AccountSupport createAccountSupport(final WebDriver driver, final AccountConfig config) {
+		checkNotNull(driver);
+		checkConfig(config);
 		switch (config.getType().toLowerCase()) {
 
 		case MINTOS:
@@ -45,6 +49,11 @@ public final class AccountSupportFactory {
 		default:
 			throw new UnsupportedOperationException("Unsupported account type '" + config.getType() + "'");
 		}
+	}
+
+	public static boolean requiresRealBrowser(final AccountConfig config) {
+		checkConfig(config);
+		return PAYPAL.equalsIgnoreCase(config.getType());
 	}
 
 }
