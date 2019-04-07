@@ -11,7 +11,7 @@ import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.credentials.CredentialsException;
 
 @Log4j2
-public class FtpExporter implements Exporter {
+public class FtpExporter extends ExporterWithCredentials {
 
 	private class FtpClientWrapper extends FTPClient implements AutoCloseable {
 
@@ -24,7 +24,8 @@ public class FtpExporter implements Exporter {
 			} catch (final IOException e) {
 				throw new ExportException("Failed to connect to FTP host due to I/O error", e);
 			} catch (final CredentialsException e) {
-				throw new ExportException("Could not connect to FTP because credential properties are missing", e);
+				throw new ExportException("Could not connect to FTP because credential properties are missing/wrong",
+						e);
 			}
 		}
 
@@ -64,10 +65,8 @@ public class FtpExporter implements Exporter {
 
 	}
 
-	private final Credentials credentials;
-
 	public FtpExporter(@NonNull final Credentials credentials) {
-		this.credentials = credentials;
+		super(credentials);
 	}
 
 	@Override

@@ -16,6 +16,8 @@ public final class ExporterFactory {
 		switch (checkNotNull(config.getType()).toLowerCase()) {
 		case "ftp":
 			return new FtpExporter(provider.getCredentials(checkNotNull(config.getTitle())));
+		case "email":
+			return new EmailExporter(provider.getCredentials(checkNotNull(config.getTitle())));
 		default:
 			throw new UnsupportedOperationException("Unsupported exporter type '" + config.getType() + "'");
 		}

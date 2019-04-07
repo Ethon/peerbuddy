@@ -35,12 +35,31 @@ public final class Credentials {
 	}
 
 	public Integer getIntProperty(final String key) throws CredentialsException {
-		return Integer.valueOf(getStringProperty(key));
+		try {
+			return Integer.valueOf(getStringProperty(key));
+		} catch (final NumberFormatException e) {
+			throw new CredentialsException(
+					"Property '" + key + "' expected to be an int property but it can't be parsed as such");
+		}
 	}
 
-	public Integer getIntProperty(final String key, final Integer defaultValue) {
+	public Integer getIntProperty(final String key, final Integer defaultValue) throws CredentialsException {
 		final String stringValue = properties.get(key);
-		return stringValue != null ? Integer.valueOf(stringValue) : defaultValue;
+		try {
+			return stringValue != null ? Integer.valueOf(stringValue) : defaultValue;
+		} catch (final NumberFormatException e) {
+			throw new CredentialsException(
+					"Property '" + key + "' expected to be an int property but it can't be parsed as such");
+		}
+	}
+
+	public Boolean getBooleanProperty(final String key) throws CredentialsException {
+		return Boolean.valueOf(getStringProperty(key));
+	}
+
+	public Boolean getBooleanProperty(final String key, final Boolean defaultValue) {
+		final String stringValue = properties.get(key);
+		return stringValue != null ? Boolean.valueOf(stringValue) : defaultValue;
 	}
 
 }
