@@ -27,6 +27,10 @@ public class MonetaryValue extends AccountValue {
 		this(BigDecimal.ZERO, currency);
 	}
 
+	public static MonetaryValue valueOf(final String s) {
+		return AccountValue.valueOf(s).monetaryValue();
+	}
+
 	public MonetaryValue add(final MonetaryValue other) {
 		checkArgument(other.getCurrency().equals(getCurrency()));
 		return new MonetaryValue(getAmount().add(other.getAmount()), getCurrency());

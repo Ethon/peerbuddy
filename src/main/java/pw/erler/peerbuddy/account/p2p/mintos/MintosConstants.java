@@ -9,6 +9,7 @@ class MintosConstants {
 	static final String OVERVIEW_PAGE_URL = "https://www.mintos.com/en/overview/";
 	static final String LOGIN_PAGE_URL = "https://www.mintos.com/en/login";
 	static final String ACCOUNT_STATEMENT_PAGE_URL = "https://www.mintos.com/en/account-statement/";
+	static final String ACCOUNT_STATEMENT_DOWNLOAD_URL = "https://www.mintos.com/en/account-statement/list.xlsx";
 
 	static final WebElementDescription USERNAME_INPUT_FIELD = WebElementDescription //
 			.inputField() //

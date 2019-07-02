@@ -1,6 +1,6 @@
 package pw.erler.peerbuddy.account;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.openqa.selenium.WebDriver;
 
@@ -21,7 +21,7 @@ public abstract class AbstractBasicSeleniumAccountSupport extends AbstractSeleni
 	protected abstract BasicAccountStatus retrieveBasicAccountStatus();
 
 	protected AbstractBasicSeleniumAccountSupport(final WebDriver webDriver,
-			final List<AccountFeature> accountFeatures) {
+			final Collection<AccountFeature> accountFeatures) {
 		super(webDriver, accountFeatures);
 	}
 

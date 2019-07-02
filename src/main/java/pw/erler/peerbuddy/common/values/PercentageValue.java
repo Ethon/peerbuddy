@@ -19,6 +19,10 @@ public class PercentageValue extends AccountValue {
 		this.value = BigDecimal.valueOf(value);
 	}
 
+	public static PercentageValue valueOf(final String s) {
+		return AccountValue.valueOf(s).percentageValue();
+	}
+
 	public String toString(final Locale locale) {
 		return NumberFormat.getPercentInstance(locale).format(value);
 	}

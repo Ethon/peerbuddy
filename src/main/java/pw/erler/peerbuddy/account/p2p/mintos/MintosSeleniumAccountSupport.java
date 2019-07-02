@@ -1,6 +1,8 @@
 package pw.erler.peerbuddy.account.p2p.mintos;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,8 @@ import pw.erler.peerbuddy.common.values.MonetaryValue;
 import pw.erler.peerbuddy.common.values.ValueParsing;
 
 public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccountSupport {
+
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 	private Map<String, MonetaryValue> parseTable(final List<WebElement> elements) {
 		final Map<String, MonetaryValue> result = new TreeMap<>();
@@ -55,10 +59,17 @@ public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccou
 	}
 
 	@Override
-	public List<Transaction> retrieveTransactions(final LocalDate fromInclusive, final LocalDate toInclusive) {
-		get(MintosConstants.OVERVIEW_PAGE_URL);
+	public List<Transaction> retrieveTransactions(final LocalDate fromInclusive, final LocalDate toInclusive)
+			throws IOException {
+		get(MintosConstants.ACCOUNT_STATEMENT_PAGE_URL);
 		clearInputField(MintosConstants.ACCOUNT_STATEMENT_PERIOD_FROM_INPUT_FIELD);
-		enterTextIntoInputField(MintosConstants.ACCOUNT_STATEMENT_PERIOD_FROM_INPUT_FIELD, "");
+		enterTextIntoInputField(MintosConstants.ACCOUNT_STATEMENT_PERIOD_FROM_INPUT_FIELD,
+				fromInclusive.format(DATE_FORMATTER));
+		clearInputField(MintosConstants.ACCOUNT_STATEMENT_PERIOD_TO_INPUT_FIELD);
+		enterTextIntoInputField(MintosConstants.ACCOUNT_STATEMENT_PERIOD_TO_INPUT_FIELD,
+				toInclusive.format(DATE_FORMATTER));
+		// final byte[] accountStatementBytes =
+		// rawHttpGet(MintosConstants.ACCOUNT_STATEMENT_DOWNLOAD_URL);
 		return Collections.emptyList();
 	}
 
