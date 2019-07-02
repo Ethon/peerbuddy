@@ -18,9 +18,9 @@ public class P2PAccountStatus extends BasicAccountStatus {
 	private final MonetaryValue investedFunds;
 	private final MonetaryValue availableFunds;
 
-	public P2PAccountStatus(final MonetaryValue accountBalance, final MonetaryValue investedFunds,
+	public P2PAccountStatus(final String name, final MonetaryValue accountBalance, final MonetaryValue investedFunds,
 			final MonetaryValue availableFunds) {
-		super(accountBalance);
+		super(name, accountBalance);
 		this.investedFunds = investedFunds;
 		this.availableFunds = availableFunds;
 	}

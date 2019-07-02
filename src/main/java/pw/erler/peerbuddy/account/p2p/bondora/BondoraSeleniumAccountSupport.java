@@ -9,6 +9,7 @@ import org.openqa.selenium.WebElement;
 import lombok.extern.log4j.Log4j2;
 import pw.erler.peerbuddy.account.p2p.AbstractSeleniumP2PAccountSupport;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.selenium_util.WebElementDescription;
 import pw.erler.peerbuddy.common.values.AccountAttributePair;
@@ -50,8 +51,8 @@ public class BondoraSeleniumAccountSupport extends AbstractSeleniumP2PAccountSup
 			.finder(finder -> finder.withXPath("//div[@class='dashboard__overview-numbers']//button[@class='btn']")) //
 			.build();
 
-	public BondoraSeleniumAccountSupport(final WebDriver webDriver) {
-		super(webDriver);
+	public BondoraSeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {
+		super(webDriver, accountConfig);
 	}
 
 	@Override
@@ -90,10 +91,11 @@ public class BondoraSeleniumAccountSupport extends AbstractSeleniumP2PAccountSup
 		final MonetaryValue goAndGrow = (MonetaryValue) stats.get("Go & Grow");
 		if (goAndGrow == null) {
 			log.debug("Account is a Go&Grow account");
-			return new P2PAccountStatus(accountValue, accountValue, accountValue);
+			return new P2PAccountStatus(accountConfig.getTitle(), accountValue, accountValue, accountValue);
 		} else {
 			log.debug(String.format("Go&Grow = %s", goAndGrow));
-			return new P2PAccountStatus(accountValue, goAndGrow, goAndGrow.add(availableFunds));
+			return new P2PAccountStatus(accountConfig.getTitle(), accountValue, goAndGrow,
+					goAndGrow.add(availableFunds));
 		}
 
 	}

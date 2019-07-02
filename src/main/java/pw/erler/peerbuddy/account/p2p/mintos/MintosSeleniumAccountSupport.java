@@ -14,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import pw.erler.peerbuddy.account.p2p.AbstractSeleniumP2PAccountSupport;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
 import pw.erler.peerbuddy.account.transactions.Transaction;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.values.MonetaryValue;
 import pw.erler.peerbuddy.common.values.ValueParsing;
@@ -37,8 +38,8 @@ public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccou
 		return result;
 	}
 
-	public MintosSeleniumAccountSupport(final WebDriver webDriver) {
-		super(webDriver);
+	public MintosSeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {
+		super(webDriver, accountConfig);
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public final class MintosSeleniumAccountSupport extends AbstractSeleniumP2PAccou
 		get(MintosConstants.OVERVIEW_PAGE_URL);
 		final Map<String, MonetaryValue> overview = parseTable(
 				getAll(find().withXPath("//li[@class='overview-box'][1]//tr/td")));
-		return new P2PAccountStatus(overview.get("Total"), overview.get("Invested Funds"),
+		return new P2PAccountStatus(accountConfig.getTitle(), overview.get("Total"), overview.get("Invested Funds"),
 				overview.get("Available Funds"));
 	}
 

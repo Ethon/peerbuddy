@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import pw.erler.peerbuddy.account.AbstractBasicSeleniumAccountSupport;
 import pw.erler.peerbuddy.account.AccountFeature;
 import pw.erler.peerbuddy.account.BasicAccountStatus;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.credentials.CredentialsException;
 import pw.erler.peerbuddy.common.values.MonetaryValue;
@@ -15,12 +16,12 @@ public final class AddikoSeleniumAccountSupport extends AbstractBasicSeleniumAcc
 
 	@Override
 	protected BasicAccountStatus retrieveBasicAccountStatus() {
-		return new BasicAccountStatus(
+		return new BasicAccountStatus(accountConfig.getTitle(),
 				MonetaryValue.valueOf(getLabelText(AddikoConstants.ACCOUNT_VALUE_LABEL) + " EUR"));
 	}
 
-	public AddikoSeleniumAccountSupport(final WebDriver webDriver) {
-		super(webDriver, Collections.singleton(AccountFeature.RETRIEVE_ACCOUNT_STATUS));
+	public AddikoSeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {
+		super(webDriver, accountConfig, Collections.singleton(AccountFeature.RETRIEVE_ACCOUNT_STATUS));
 	}
 
 	@Override

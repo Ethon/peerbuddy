@@ -15,6 +15,7 @@ import pw.erler.peerbuddy.common.values.MonetaryValue;
 @EqualsAndHashCode
 public class BasicAccountStatus {
 
+	private String name;
 	private MonetaryValue accountBalance;
 
 	public <T> T accept(final AccountStatusVisitor<T> visitor) {

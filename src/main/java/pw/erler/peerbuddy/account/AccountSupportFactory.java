@@ -35,20 +35,20 @@ public final class AccountSupportFactory {
 		switch (config.getType().toLowerCase()) {
 
 		case MINTOS:
-			return new MintosSeleniumAccountSupport(driver);
+			return new MintosSeleniumAccountSupport(driver, config);
 		case LENNDY:
-			return new LenndySeleniumAccountSupport(driver);
+			return new LenndySeleniumAccountSupport(driver, config);
 		case ESTATEGURU:
-			return new EstateGuruSeleniumAccountSupport(driver);
+			return new EstateGuruSeleniumAccountSupport(driver, config);
 		case LENDY:
-			return new LendySeleniumAccountSupport(driver);
+			return new LendySeleniumAccountSupport(driver, config);
 		case BONDORA:
-			return new BondoraSeleniumAccountSupport(driver);
+			return new BondoraSeleniumAccountSupport(driver, config);
 
 		case PAYPAL:
-			return new PaypalSeleniumAccountSupport(driver);
+			return new PaypalSeleniumAccountSupport(driver, config);
 		case ADDIKO:
-			return new AddikoSeleniumAccountSupport(driver);
+			return new AddikoSeleniumAccountSupport(driver, config);
 
 		default:
 			throw new UnsupportedOperationException("Unsupported account type '" + config.getType() + "'");

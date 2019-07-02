@@ -6,6 +6,7 @@ import org.openqa.selenium.WebDriver;
 
 import pw.erler.peerbuddy.account.p2p.AbstractSeleniumP2PAccountSupport;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.selenium_util.WebElementDescription;
 import pw.erler.peerbuddy.common.values.AccountValue;
@@ -35,8 +36,8 @@ public class LendySeleniumAccountSupport extends AbstractSeleniumP2PAccountSuppo
 			.finder(finder -> finder.withXPath("//form[@id='login']//button").isDisplayed(true)) //
 			.build();
 
-	public LendySeleniumAccountSupport(final WebDriver webDriver) {
-		super(webDriver);
+	public LendySeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {
+		super(webDriver, accountConfig);
 	}
 
 	@Override
@@ -52,7 +53,7 @@ public class LendySeleniumAccountSupport extends AbstractSeleniumP2PAccountSuppo
 		get(LOANS_PAGE);
 		final Map<String, AccountValue> attributes = getAttributes(
 				find().withXPath("//div[@class='c-account-overview__inner']//article"));
-		return new P2PAccountStatus((MonetaryValue) attributes.get("BALANCE"),
+		return new P2PAccountStatus(accountConfig.getTitle(), (MonetaryValue) attributes.get("BALANCE"),
 				(MonetaryValue) attributes.get("LIVE LOAN PARTS"), (MonetaryValue) attributes.get("AVAILABLE FUNDS"));
 	}
 

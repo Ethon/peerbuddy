@@ -1,5 +1,6 @@
 package pw.erler.peerbuddy.execution;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,24 +27,36 @@ import pw.erler.peerbuddy.common.selenium_util.error.ErrorUtil;
 @Log4j2
 public class AccountRunner {
 
+	private static List<AccountRunResult> getResults(final Map<AccountConfig, List<AccountRunResult>> accountStatusMap,
+			final AccountConfig account) {
+		return accountStatusMap.computeIfAbsent(account, a -> new ArrayList<>());
+	}
+
 	private static class StatusVisitor implements AccountStatusVisitor<AccountRunResult> {
 
 		private final AccountConfig account;
-		private final Map<AccountConfig, AccountRunResult> accountStatusMap;
+		private final Map<AccountConfig, List<AccountRunResult>> accountStatusMap;
 
-		public StatusVisitor(final AccountConfig account, final Map<AccountConfig, AccountRunResult> accountStatusMap) {
+		private AccountRunResult addResult(final AccountRunResult result) {
+			final List<AccountRunResult> results = getResults(accountStatusMap, account);
+			results.add(result);
+			return result;
+		}
+
+		public StatusVisitor(final AccountConfig account,
+				final Map<AccountConfig, List<AccountRunResult>> accountStatusMap) {
 			this.account = account;
 			this.accountStatusMap = accountStatusMap;
 		}
 
 		@Override
 		public AccountRunResult visit(final BasicAccountStatus status) {
-			return accountStatusMap.put(account, new AccountRunResult(status));
+			return addResult(new AccountRunResult(status));
 		}
 
 		@Override
 		public AccountRunResult visit(final P2PAccountStatus status) {
-			return accountStatusMap.put(account, new AccountRunResult(status));
+			return addResult(new AccountRunResult(status));
 		}
 
 	}
@@ -53,7 +66,7 @@ public class AccountRunner {
 	private final Map<String, List<AccountConfig>> accountsGroupedByType;
 
 	private void runAccountImpl(final AccountConfig account,
-			final Map<AccountConfig, AccountRunResult> accountStatusMap, final int retriesLeft) {
+			final Map<AccountConfig, List<AccountRunResult>> accountStatusMap, final int retriesLeft) {
 		boolean error = false;
 		try (AutoCloseableWebDriver driver = DriverFactory.createDriver(config.getSeleniumConfig(),
 				AccountSupportFactory.requiresRealBrowser(account))) {
@@ -67,7 +80,7 @@ public class AccountRunner {
 			} catch (final Exception e) {
 				log.error(String.format("Error while running account '%s'", account.getTitle()), e);
 				ErrorUtil.dumpPageSource(driver, account.getTitle());
-				accountStatusMap.put(account, new AccountRunResult(e));
+				getResults(accountStatusMap, account).add(new AccountRunResult(e));
 				error = true;
 			}
 		}
@@ -85,7 +98,7 @@ public class AccountRunner {
 	}
 
 	private void runAccount(final ExecutorService executorService, final AccountConfig account,
-			final Map<AccountConfig, AccountRunResult> accountStatusMap, final int retriesLeft) {
+			final Map<AccountConfig, List<AccountRunResult>> accountStatusMap, final int retriesLeft) {
 		executorService.execute(() -> runAccountImpl(account, accountStatusMap, retriesLeft));
 	}
 
@@ -97,9 +110,10 @@ public class AccountRunner {
 				.collect(Collectors.groupingBy(AccountConfig::getType));
 	}
 
-	public Map<AccountConfig, AccountRunResult> runAll() throws InterruptedException {
-		final Map<AccountConfig, AccountRunResult> accountStatusMap = new HashMap<>();
-		final Map<AccountConfig, AccountRunResult> synchronizedMap = Collections.synchronizedMap(accountStatusMap);
+	public Map<AccountConfig, List<AccountRunResult>> runAll() throws InterruptedException {
+		final Map<AccountConfig, List<AccountRunResult>> accountStatusMap = new HashMap<>();
+		final Map<AccountConfig, List<AccountRunResult>> synchronizedMap = Collections
+				.synchronizedMap(accountStatusMap);
 		final ExecutorService executorService = Executors
 				.newFixedThreadPool(config.getMaximumNumberOfParallelThreads());
 		try {

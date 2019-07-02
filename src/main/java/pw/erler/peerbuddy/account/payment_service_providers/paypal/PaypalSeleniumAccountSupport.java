@@ -6,12 +6,13 @@ import org.openqa.selenium.WebDriver;
 
 import pw.erler.peerbuddy.account.AbstractBasicSeleniumAccountSupport;
 import pw.erler.peerbuddy.account.BasicAccountStatus;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 
 public class PaypalSeleniumAccountSupport extends AbstractBasicSeleniumAccountSupport {
 
-	public PaypalSeleniumAccountSupport(final WebDriver webDriver) {
-		super(webDriver, Collections.emptyList());
+	public PaypalSeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {
+		super(webDriver, accountConfig, Collections.emptyList());
 	}
 
 	@Override
@@ -27,7 +28,8 @@ public class PaypalSeleniumAccountSupport extends AbstractBasicSeleniumAccountSu
 
 	@Override
 	protected BasicAccountStatus retrieveBasicAccountStatus() {
-		return doRetrieveBasicAccountStatus(PaypalConstants.SUMMARY_PAGE_URL, PaypalConstants.VALUE_LABEL);
+		return doRetrieveBasicAccountStatus(accountConfig.getTitle(), PaypalConstants.SUMMARY_PAGE_URL,
+				PaypalConstants.VALUE_LABEL);
 	}
 
 }

@@ -34,6 +34,7 @@ import com.google.common.io.ByteStreams;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import pw.erler.peerbuddy.account.transactions.Transaction;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.selenium_util.ElementFinder;
 import pw.erler.peerbuddy.common.selenium_util.WebElementDescription;
 import pw.erler.peerbuddy.common.selenium_util.WebElementType;
@@ -47,6 +48,7 @@ import pw.erler.peerbuddy.common.values.AccountValue;
 public abstract class AbstractSeleniumAccountSupport implements AccountSupport {
 
 	protected final WebDriver webDriver;
+	protected final AccountConfig accountConfig;
 	protected Set<String> activeWindowHandles;
 	private final Set<AccountFeature> accountFeatures;
 
@@ -162,9 +164,10 @@ public abstract class AbstractSeleniumAccountSupport implements AccountSupport {
 		click(pipeline, 0);
 	}
 
-	protected AbstractSeleniumAccountSupport(final WebDriver webDriver,
+	protected AbstractSeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig,
 			final Collection<AccountFeature> accountFeatures) {
 		this.webDriver = webDriver;
+		this.accountConfig = accountConfig;
 		this.accountFeatures = Sets.immutableEnumSet(accountFeatures);
 	}
 

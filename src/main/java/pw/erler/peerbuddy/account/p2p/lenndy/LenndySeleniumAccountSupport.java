@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 
 import pw.erler.peerbuddy.account.p2p.AbstractSeleniumP2PAccountSupport;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.values.AccountAttributePair;
 import pw.erler.peerbuddy.common.values.AccountAttributeParsing;
@@ -15,8 +16,8 @@ import pw.erler.peerbuddy.common.values.AccountValue;
 
 public class LenndySeleniumAccountSupport extends AbstractSeleniumP2PAccountSupport {
 
-	public LenndySeleniumAccountSupport(final WebDriver webDriver) {
-		super(webDriver);
+	public LenndySeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {
+		super(webDriver, accountConfig);
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class LenndySeleniumAccountSupport extends AbstractSeleniumP2PAccountSupp
 						.map(WebElement::getText) //
 						.map(AccountAttributeParsing::parseAccountAttributePair).collect(Collectors
 								.toMap(AccountAttributePair::getKey, AccountAttributePair::getValue, (a, b) -> a));
-		return LenndyAccountOverview.ofAccountAttributeMap(accountAttributes).toAccountStatus();
+		return LenndyAccountOverview.ofAccountAttributeMap(accountAttributes).toAccountStatus(accountConfig.getTitle());
 	}
 
 }

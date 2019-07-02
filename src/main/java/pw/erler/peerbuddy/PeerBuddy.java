@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.log4j.Log4j2;
@@ -34,7 +35,7 @@ public final class PeerBuddy {
 				.createCredentialsProvider(config.getPasswordConfig());
 
 		// Retrieve the status of all accounts.
-		final Map<AccountConfig, AccountRunResult> accountStatus = new AccountRunner(credentialsProvider, config,
+		final Map<AccountConfig, List<AccountRunResult>> accountStatus = new AccountRunner(credentialsProvider, config,
 				config.getAccounts()).runAll();
 
 		// Create the export model and log it.

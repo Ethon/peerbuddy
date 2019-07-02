@@ -6,14 +6,15 @@ import org.openqa.selenium.WebDriver;
 
 import pw.erler.peerbuddy.account.p2p.AbstractSeleniumP2PAccountSupport;
 import pw.erler.peerbuddy.account.p2p.P2PAccountStatus;
+import pw.erler.peerbuddy.common.config.AccountConfig;
 import pw.erler.peerbuddy.common.credentials.Credentials;
 import pw.erler.peerbuddy.common.values.AccountValue;
 import pw.erler.peerbuddy.common.values.MonetaryValue;
 
 public class EstateGuruSeleniumAccountSupport extends AbstractSeleniumP2PAccountSupport {
 
-	public EstateGuruSeleniumAccountSupport(final WebDriver webDriver) {
-		super(webDriver);
+	public EstateGuruSeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {
+		super(webDriver, accountConfig);
 	}
 
 	@Override
@@ -35,7 +36,8 @@ public class EstateGuruSeleniumAccountSupport extends AbstractSeleniumP2PAccount
 		final MonetaryValue invested = ((MonetaryValue) attributes.get("Invested")).negate();
 		final MonetaryValue reserved = ((MonetaryValue) attributes.get("Reserved")).negate();
 		final MonetaryValue availableAmount = (MonetaryValue) attributes.get("Available Amount");
-		return new P2PAccountStatus(totalAccountValue, invested.add(reserved), availableAmount);
+		return new P2PAccountStatus(accountConfig.getTitle(), totalAccountValue, invested.add(reserved),
+				availableAmount);
 	}
 
 }

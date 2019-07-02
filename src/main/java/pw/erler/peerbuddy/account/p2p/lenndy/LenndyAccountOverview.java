@@ -25,8 +25,8 @@ public class LenndyAccountOverview {
 		return new LenndyAccountOverview(accountBalance, currentlyInvestedAmount, availableFunds);
 	}
 
-	public P2PAccountStatus toAccountStatus() {
-		return new P2PAccountStatus(accountBalance, currentlyInvestedAmount, availableFunds);
+	public P2PAccountStatus toAccountStatus(final String name) {
+		return new P2PAccountStatus(name, accountBalance, currentlyInvestedAmount, availableFunds);
 	}
 
 }
