@@ -28,33 +28,37 @@ public final class PeerBuddy {
 	public static void main(final String[] args) throws IOException, InterruptedException {
 
 		LoggingUtil.redirectConsoleOutputStreamsToLog();
+		try {
+			// Load the config and retrieve credentials.
+			final PeerBuddyConfig config = ConfigLoader.loadConfig(Paths.get("peerbuddy.json"));
+			final CredentialsProvider credentialsProvider = CredentialsProviderFactory
+					.createCredentialsProvider(config.getPasswordConfig());
 
-		// Load the config and retrieve credentials.
-		final PeerBuddyConfig config = ConfigLoader.loadConfig(Paths.get("peerbuddy.json"));
-		final CredentialsProvider credentialsProvider = CredentialsProviderFactory
-				.createCredentialsProvider(config.getPasswordConfig());
+			// Retrieve the status of all accounts.
+			final Map<AccountConfig, List<AccountRunResult>> accountStatus = new AccountRunner(credentialsProvider,
+					config, config.getAccounts()).runAll();
 
-		// Retrieve the status of all accounts.
-		final Map<AccountConfig, List<AccountRunResult>> accountStatus = new AccountRunner(credentialsProvider, config,
-				config.getAccounts()).runAll();
+			// Create the export model and log it.
+			final AccountStatusOverviewModel model = new ExportModelGenerator().createModel(config, accountStatus);
+			log.info("\n" + model.asAsciiTable());
 
-		// Create the export model and log it.
-		final AccountStatusOverviewModel model = new ExportModelGenerator().createModel(config, accountStatus);
-		log.info("\n" + model.asAsciiTable());
-
-		// Create the JSON export and export it.
-		final String jsonModel = GsonFactory.createGson().toJson(model);
-		log.info("\n" + jsonModel);
-		config.getExports().stream().filter(ExportConfig::isEnabled).forEach(exportConfig -> {
-			log.info("Export " + exportConfig);
-			try {
-				ExporterFactory.createExporter(exportConfig, credentialsProvider).exportTo(exportConfig.getExportFile(),
-						new ByteArrayInputStream(jsonModel.getBytes(StandardCharsets.UTF_8)));
-				log.info("Finished exporting " + exportConfig);
-			} catch (final Exception e) {
-				log.error("Error while exporting " + exportConfig, e);
-			}
-		});
+			// Create the JSON export and export it.
+			final String jsonModel = GsonFactory.createGson().toJson(model);
+			log.info("\n" + jsonModel);
+			config.getExports().stream().filter(ExportConfig::isEnabled).forEach(exportConfig -> {
+				log.info("Export " + exportConfig);
+				try {
+					ExporterFactory.createExporter(exportConfig, credentialsProvider).exportTo(
+							exportConfig.getExportFile(),
+							new ByteArrayInputStream(jsonModel.getBytes(StandardCharsets.UTF_8)));
+					log.info("Finished exporting " + exportConfig);
+				} catch (final Exception e) {
+					log.error("Error while exporting " + exportConfig, e);
+				}
+			});
+		} catch (Exception e) {
+			log.error("An error occurred", e);
+		}
 	}
 
 }

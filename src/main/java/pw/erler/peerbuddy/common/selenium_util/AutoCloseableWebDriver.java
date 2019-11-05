@@ -47,7 +47,7 @@ public class AutoCloseableWebDriver implements WebDriver, AutoCloseable {
 
 	@Override
 	public void close() {
-		getWindowHandles().forEach(handle -> switchTo().window(handle).close());
+		impl.quit();
 	}
 
 	@Override

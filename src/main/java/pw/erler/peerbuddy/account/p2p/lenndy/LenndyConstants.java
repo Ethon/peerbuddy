@@ -34,7 +34,7 @@ class LenndyConstants {
 	static final WebElementDescription LOGIN_BUTTON = WebElementDescription //
 			.button() //
 			.description("Login") //
-			.finder(finder -> finder.withXPath("//input[@class='buttons button-login']").isDisplayed(true)) //
+			.finder(finder -> finder.withXPath("//button[@class='signin-submit-style']").isDisplayed(true)) //
 			.build();
 
 }

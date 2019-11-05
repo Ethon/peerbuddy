@@ -48,7 +48,7 @@ public class BondoraSeleniumAccountSupport extends AbstractSeleniumP2PAccountSup
 	private static final WebElementDescription MORE_STATS_BUTTON = WebElementDescription //
 			.button() //
 			.description("More stats") //
-			.finder(finder -> finder.withXPath("//div[@class='dashboard__overview-numbers']//button[@class='btn']")) //
+			.finder(finder -> finder.withXPath("//div[@class='dashboard__overview-numbers mbs']//button[@class='btn']")) //
 			.build();
 
 	public BondoraSeleniumAccountSupport(final WebDriver webDriver, final AccountConfig accountConfig) {

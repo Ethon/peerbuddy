@@ -43,6 +43,16 @@ public final class ValueParsing {
 				}
 			}
 			return ',';
+		} else if (lastDot > lastComma) {
+			// Before assuming that a dot is the decimal separator, check if it might be a
+			// thousands separator without a decimal separator following.
+			if (lastDot + 3 < value.length()) {
+				final String following = value.substring(lastDot + 1, lastDot + 4);
+				if (following.matches("\\d{3}")) {
+					return ',';
+				}
+			}
+			return '.';
 		}
 		return '.';
 	}

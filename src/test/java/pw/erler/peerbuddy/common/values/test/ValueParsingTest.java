@@ -101,6 +101,7 @@ public class ValueParsingTest {
 		testMonetaryValue("- 1.225,61 EUR", "-1225.61", EUR);
 		testMonetaryValue("- 459,61 EUR", "-459.61", EUR);
 		testMonetaryValue("- 555 EUR", "-555", EUR);
+		testMonetaryValue("1.225 EUR", "1225", EUR);
 	}
 
 	@Test

@@ -32,15 +32,25 @@ public class AccountRunner {
 		return accountStatusMap.computeIfAbsent(account, a -> new ArrayList<>());
 	}
 
+	private static AccountRunResult addOrUpdateResult(List<AccountRunResult> results, AccountRunResult result) {
+		for (int i = 0; i < results.size(); ++i) {
+			AccountRunResult current = results.get(i);
+			if (current.getAccountConfig().equals(result.getAccountConfig()) && current.getException().isPresent()) {
+				results.set(i, result);
+				return result;
+			}
+		}
+		results.add(result);
+		return result;
+	}
+
 	private static class StatusVisitor implements AccountStatusVisitor<AccountRunResult> {
 
 		private final AccountConfig account;
 		private final Map<AccountConfig, List<AccountRunResult>> accountStatusMap;
 
 		private AccountRunResult addResult(final AccountRunResult result) {
-			final List<AccountRunResult> results = getResults(accountStatusMap, account);
-			results.add(result);
-			return result;
+			return addOrUpdateResult(getResults(accountStatusMap, account), result);
 		}
 
 		public StatusVisitor(final AccountConfig account,
@@ -51,12 +61,12 @@ public class AccountRunner {
 
 		@Override
 		public AccountRunResult visit(final BasicAccountStatus status) {
-			return addResult(new AccountRunResult(status));
+			return addResult(new AccountRunResult(account, status));
 		}
 
 		@Override
 		public AccountRunResult visit(final P2PAccountStatus status) {
-			return addResult(new AccountRunResult(status));
+			return addResult(new AccountRunResult(account, status));
 		}
 
 	}
@@ -80,9 +90,12 @@ public class AccountRunner {
 			} catch (final Exception e) {
 				log.error(String.format("Error while running account '%s'", account.getTitle()), e);
 				ErrorUtil.dumpPageSource(driver, account.getTitle());
-				getResults(accountStatusMap, account).add(new AccountRunResult(e));
+				addOrUpdateResult(getResults(accountStatusMap, account), new AccountRunResult(account, e));
 				error = true;
 			}
+		} catch (Exception e) {
+			log.error("Error creating web driver", e);
+			System.exit(-1);
 		}
 
 		if (error) {
